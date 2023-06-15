@@ -4,16 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\RakBuku;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class RakBukuController extends Controller
 {
+    private function pre($arr = [])
+    {
+        echo '<pre>';
+        print_r($arr);
+        echo '</pre>';
+    }
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $rak = RakBuku::all();
+        $this->pre($request->session()->all());
         return view('rak_buku.index', ['rak' => $rak]);
     }
 
@@ -33,12 +41,13 @@ class RakBukuController extends Controller
      */
     public function store(Request $request)
     {
-        $rak = new RakBuku();
-        $rak->nama = $request->input('nama');
-        $rak->lokasi = $request->input('lokasi');
-        $rak->keterangan = $request->input('keterangan');
-        $rak->save();
-    
+        $rak = new RakBuku(); 
+        $rak->nama = $request->input('nama'); 
+        $rak->lokasi = $request->input('lokasi'); 
+        $rak->keterangan = $request->input('keterangan'); 
+        $request->session()->put('rak', $rak); 
+        $rak->save(); 
+        $request->session()->flash('pesan', 'Data telah berhasil tersimpan.'); 
         return redirect('/rak_buku');
     }
 
@@ -66,19 +75,22 @@ class RakBukuController extends Controller
      */
     public function update(Request $request, RakBuku $rakBuku)
     {
-        $rakBuku->nama = $request->input('nama');
-        $rakBuku->lokasi = $request->input('lokasi');
-        $rakBuku->keterangan = $request->input('keterangan');
-        $rakBuku->save();
+        $rakBuku->nama = $request->input('nama'); 
+        $rakBuku->lokasi = $request->input('lokasi'); 
+        $rakBuku->keterangan = $request->input('keterangan'); 
+        $rakBuku->save(); 
+        $request->session()->flash('pesan', 'Data telah berhasil diubah.'); 
         return redirect('/rak_buku');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(RakBuku $rakBuku)
+    public function destroy(Request $request, RakBuku $rakBuku)
     {
         $rakBuku->delete();
+        $request->session()->flash('pesan', 'Data telah berhasil dihapus.');
+        // $request->session()->flush();
         return redirect('/rak_buku');
     }
 }
